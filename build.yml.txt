@@ -1,0 +1,37 @@
+name: Build Android Mod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Lets you manually trigger a build from the GitHub website
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (Android)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out your mod's code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Install the Geode SDK + CLI (handles NDK setup too)
+      - name: Setup Geode
+        uses: geode-sdk/build-geode-mod/setup@main
+
+      # 3. Build the mod for Android (arm64)
+      - name: Build mod
+        uses: geode-sdk/build-geode-mod@main
+        id: build
+        with:
+          target: android64   # arm64-v8a (most modern Android phones)
+
+      # 4. Upload the .geode file as a downloadable artifact
+      - name: Upload .geode file
+        uses: actions/upload-artifact@v4
+        with:
+          name: fps-bypass-android
+          path: ${{ steps.build.outputs.build-output }}
